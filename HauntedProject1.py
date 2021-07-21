@@ -11,15 +11,18 @@ snd_path = path + "/Jul16_actualFootsteps.wav"
 soundplayer = SfPlayer(snd_path, loop=True, mul=0.3)
 v = HRTF(soundplayer, azimuth=0, elevation=0, mul=0.5)
 
+# Function runs when a key is pressed
 def on_press(key):
     global v
     try:
         print("alphanumeric key {0} pressed".format(key.char))
     except:
         print('special key {0} pressed'.format(key))
+        # If user clicks the "up" arrow, sound starts playing
         if key == keyboard.Key.up:
             v.out()
 
+# Listening for a key press
 listener = keyboard.Listener(
     on_press=on_press)
 
