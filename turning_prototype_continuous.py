@@ -32,104 +32,91 @@ class Sound():
         dy = y1 - self.y
         angle = 0           #initialize angle (for scope reasons
         if dx != 0:         #only calculate if dx isnt zero (otherwise we get zero division error)
-            angle = ((math.atan2(dy,dx))*(180/math.pi) - 90 + userAngle)
+            angle = ((math.atan2(dy,dx))*(180/math.pi) - 90 + userAngle)   #calculate azi (get arctan of the slope, then convert to degrees
+            #then rotate 90 degrees to account for tan being based on west, not north, then account for user angle (which way they are facing)
         else:
-            if dy < 0:
-                angle = 180 - userAngle
+            if dy < 0:  #if user is north of sound
+                angle = 180 - userAngle #sound is behind them, - user angle
             else:
-                angle = 0 - userAngle
+                angle = 0 - userAngle   #if user is south of sound, should be in front (taking into acount their angle)
         return angle
     def get_mul(self, userCoords):
-        x1 = userCoords[0]
+        '''returns volume for the sound based on its distance from user'''
+        x1 = userCoords[0]  #get coords
         y1 = userCoords[1]
-        dx = self.x - x1
+        dx = self.x - x1    #calculate distance
         dy = self.y = y1
-        distance = math.sqrt(dx**2+dy**2)
-        if distance <=1:
-            return 1
+        distance = math.sqrt(dx**2+dy**2)   #use pythagoras
+        if distance <=1:    #if user is within 1 unit
+            return 1        #as loud as possible
         else:
-            return 1/distance
+            return 1/distance   #mul is inversely proportional to user's distance
     def set_mul_and_azi(self, userCoords, userAngle):
-        azi = float(self.get_azi(userCoords,userAngle))
-        mul = float(self.get_mul(userCoords))
-        self.hrtf.setAzimuth(azi)
-        self.hrtf.setMul(mul)
+        '''sets the mul and azi in the hrtf based on user position/angle'''
+        azi = float(self.get_azi(userCoords,userAngle))    #use function to get azi
+        mul = float(self.get_mul(userCoords))              #use function to get mul
+        self.hrtf.setAzimuth(azi)                   #set azi
+        self.hrtf.setMul(mul)                       #set mul
     def is_playing(self):
-        return self.hrtf.isPlaying()
+        '''returns a bool based on whether the sound is still playing'''
+        return self.hrtf.isPlaying()    #use hrtf built in method lol
 
 class User():
+    '''represents a user in the coordinate plane with a position and an angle
+    controlled by arrow keys (up = forward, l/r = turn 90 degrees)'''
     def __init__(self, coords):
+        '''creats a user with coordinates'''
         self.x = coords[0]
         self.y = coords[1]
-        self.angle = 0
+        self.angle = 0  #start facing north
     def on_press(self, key):
-        if key == keyboard.Key.left:
-            self.turn(1)
+        '''changes the user's position and angle based on keystrokes'''
+        if key == keyboard.Key.left: 
+            self.turn(1)    #turn positive angle (left), on left keystroke
         elif key == keyboard.Key.right:
-            self.turn(-1)
+            self.turn(-1)   #turn a negative angle (right), on right keystroke
         elif key == keyboard.Key.up:
-            self.take_step(True)
-        elif key == keyboard.Key.down:
-            self.take_step(False)
-        print(self.x, self.y, self.angle)
+            self.take_step(True)    #take a step forward
+        elif key == keyboard.Key.down:  
+            self.take_step(False)   #take a step back
+        print(self.x, self.y, self.angle)   #print coords and angle
     def turn(self, dir):
-        targetAngle = (self.angle + dir*90) % 360
-        while round(self.angle) != round(targetAngle):
-            self.angle += dir * 5
-            self.angle = self.angle % 360
-            time.sleep(0.1)
+        '''changes the user's angle slowly, 90 degrees left or right'''
+        targetAngle = (self.angle + dir*90) % 360   #calculate target angle based on direction (1 or -1)
+        while round(self.angle) != round(targetAngle):  #keep iterating until we iterate angle enough to get to the target
+            self.angle += dir * 5              #add or subtract based on dir
+            self.angle = self.angle % 360      #keep it mod 360
+            time.sleep(0.1)                    #wait, so the turn happens gradually
     def take_step(self, forward):
-        dir = 1
+        '''takes a step forward, in the direction the user is facing'''
+        dir = 1             #make dir 1 or -1 based on the value of forward (bool)
         if not forward:
             dir = -1
-        angleFromX = (90 + self.angle)*(math.pi/180)
-        changeX = dir * math.cos(angleFromX)
+        angleFromX = (90 + self.angle)*(math.pi/180)   #calculate the angle from the western x axis (bc trig)
+        changeX = dir * math.cos(angleFromX)            #calculate steps to take in x and y direction
         changeY = dir * math.sin(angleFromX)
-        self.x += changeX
+        self.x += changeX       #iterate coords accordingly
         self.y += changeY
     def get_coords(self):
+        '''returns the player's coordinates'''
         return [self.x, self.y]
     def get_angle(self):
+        '''returns the players angle'''
         return self.angle
 
-user = User([0,0])
-piano = Sound("piano_unaltered.wav", [-10,0], 0.5, user)
+user = User([0,0])  #make a user at 0,0
+piano = Sound("piano_unaltered.wav", [-10,0], 0.5, user)   #make the sound at -10, 0
 
-'''
-#SNDS_PATH = "hello.wav"
-white_noise = Noise(0.3)
-#sound_player = SfPlayer(SNDS_PATH, loop=True,  mul=0.3)
-v = HRTF(white_noise, azimuth=0, elevation=0, mul=0.5).out()
-
-def on_press(key):
-    try:
-        f = 'alphanumeric key {0} pressed'.format(key.char)
-    except AttributeError:
-        if key == keyboard.Key.left:
-
-        elif key == keyboard.Key.right:
-            azi += 10
-            print(azi) # check what azi value is to make sure azi is changing
-        v.setAzimuth(float(azi))
-'''
-
-
-# azi = Phasor(0.2, mul=360)
-
-# listener = keyboard.Listener(
-#     on_press=lambda event: on_press(event, azi=azi))
-# print(azi)
-# v = HRTF(sound_player, azimuth=azi, elevation=ele, mul=0.5)
-
-def press(key):
+def press(key):     #make the press function
     global user
-    user.on_press(key)
+    user.on_press(key)  #it just calls the user method
 
 
-listener = keyboard.Listener(on_press=press)
+listener = keyboard.Listener(on_press=press)    #make and start listener
 listener.start()
-piano.play()
-while piano.is_playing():
+piano.play()    #start playing piano
+
+while piano.is_playing():       #while its playing, constantly update the azi and mul based on user's coords and angle
     piano.set_mul_and_azi(user.get_coords(), user.get_angle())
 
-time.sleep(60)
+time.sleep(60)  #idk why this is here but it works
