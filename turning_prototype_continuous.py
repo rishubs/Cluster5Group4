@@ -4,30 +4,34 @@ import os
 import time
 import math
 
+#make and start pyo server
 s = Server(duplex=1, buffersize=1024, winhost='asio', nchnls=2).boot()
 s.start()
 
 class Sound():
-    """is a sound rawr"""
+    '''stores a sound file/player, and is spatialized based on
+    the user's coordinates'''
     def __init__(self, filename, coords, mul,user,loop=False):
-        '''makes a sound located at coords'''
-        self.x = coords[0]
-        self.y = coords[1]
-        self.user = user
-        self.sndPlayer = SfPlayer(filename,loop=loop,mul=mul)
-        self.hrtf = HRTF(self.sndPlayer)
+        '''makes a sound located at coords in the plane'''
+        self.x = coords[0]  #store the x coord of the sound
+        self.y = coords[1]  #store the y coord
+        self.user = user    #store the user (to use their coords later)
+        self.sndPlayer = SfPlayer(filename,loop=loop,mul=mul)   #store sound as player
+        self.hrtf = HRTF(self.sndPlayer)  #store hrtf
     def play(self):
-        userCoords = self.user.get_coords()
-        userAngle = self.user.get_angle()
-        self.set_mul_and_azi(userCoords,userAngle)
-        self.hrtf.out()
+        '''plays the sound, spatialized to user's initial coords'''
+        userCoords = self.user.get_coords() #get user's initial coords
+        userAngle = self.user.get_angle()   #get users initial angle 
+        self.set_mul_and_azi(userCoords,userAngle)  #set the volume and angle of the sound initially
+        self.hrtf.out()                             #and send it out
     def get_azi(self, userCoords,userAngle):
-        x1 = userCoords[0]
+        '''returns the proper azimuth in order to spatialize the sound based on user's coords'''
+        x1 = userCoords[0]  #get coords
         y1 = userCoords[1]
-        dx = x1 - self.x
+        dx = x1 - self.x    #calculate distance between sound and user on x and y axes
         dy = y1 - self.y
-        angle = 0
-        if dx != 0:
+        angle = 0           #initialize angle (for scope reasons
+        if dx != 0:         #only calculate if dx isnt zero (otherwise we get zero division error)
             angle = ((math.atan2(dy,dx))*(180/math.pi) - 90 + userAngle)
         else:
             if dy < 0:
