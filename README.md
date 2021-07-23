@@ -1,6 +1,9 @@
 # Cluster 5 Group 4 Project
 
 ## File Descriptions:
+#### turning_prototype_continuous.py
+Coordinate system with piano anchor point at (-10, 0). User can walk around with arrow keys, sound azimuth/volume changes based on that. Player can turn with left/right with arrow keys.
+
 #### player coords thing.py
 Coordinate system with piano anchor point at (-10, 0). User can walk around the coordinate plane with up/down/right/left arrows and the location of the sound they hear changes accordingly. Player's current coordinates are printed in the console after each step they take.
 
