@@ -105,12 +105,14 @@ class User():
         return self.angle
 
 user = User([0,0])  #make a user at 0,0
-piano = Sound("piano_unaltered.wav", [-10,0], 0.5, user)   #make the sound at -10, 0
+piano = Sound("./Sounds/piano_unaltered.wav", [-10,0], 0.5, user)   #make the sound at -10, 0
+
+userCoords = User.get_coords()
+
 
 def press(key):     #make the press function
     global user
     user.on_press(key)  #it just calls the user method
-
 
 listener = keyboard.Listener(on_press=press)    #make and start listener
 listener.start()
