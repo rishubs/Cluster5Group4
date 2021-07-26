@@ -1,7 +1,7 @@
 import turtle
 
 wn = turtle.Screen()
-wn.setup(width=700,height=400)
+wn.setup(width=900,height=700)
 wn.title("Python Turtle Movement")
 wn.bgpic("downstairsHouse.gif")
 
@@ -17,6 +17,8 @@ def playerRight():
 def playerLeft():
   player.setx(player.xcor()-51.5)
   # player.left(5)
+def changeUp():
+  wn.bgpic("upstairsGIF.gif")
 
 player = turtle.Turtle()
 player.speed(0) #this will make your player created instantly
@@ -33,6 +35,7 @@ wn.onkey(playerUp, "Up") #function, key
 wn.onkey(playerDown, "Down")
 wn.onkey(playerRight, "Right")
 wn.onkey(playerLeft, "Left")
+wn.onkey(changeUp, "u")
 wn.listen()
 
 #update the window
