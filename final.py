@@ -204,25 +204,25 @@ wn.onkey(playerDown, "Down")
 wn.onkey(playerRight, "Right")
 wn.onkey(playerLeft, "Left")
 
-plr = SfPlayer("final_slowwalk1.wav", loop=True, mul = 0.2)
+plr = SfPlayer("./Sounds/final_slowwalk1.wav", loop=True, mul = 0.2)
 footsteps = HRTF(plr)
-scene1plr = SfPlayer('scene1ver2.wav', mul = 0.5)
-finalScenePlr = SfPlayer('final_lastscenever2.wav', mul = 0.5)
+scene1plr = SfPlayer('./Sounds/scene1ver2.wav', mul = 0.5)
+finalScenePlr = SfPlayer('./Sounds/final_lastscenever2.wav', mul = 0.5)
 
 
 user = User([16,7], footsteps)  #make a user at 0,0
-piano = Sound("final_pianopiece.wav", [10 , 5], 0.2, user, 25, 'music', loop=True)   #make the sound at -10, 0
-static = Sound("final_static.wav", [15,6.5], 0.2, user, 25, 'entry', loop=True)
-eating = Sound("final_monstereating.wav",[1,9],0.5, user, 10, 'kitchen',loop = True, triggered=True)
-where = Sound("final_deepwhere.wav",[2,12],0.5, user, 10, 'kitchen', triggered=True)
-laugh = Sound("final_laughing.wav",[5,11],0.5, user, 10, 'kitchen',loop = True, triggered=True)
-guitar = Sound("final_guitar1.wav",[7,5],0.7, user, 5, 'family', triggered = True)
-breathing = Sound("final_heavybreathing.wav",[8,10],0.3, user, 5, 'dining', triggered=True)
-dining = Sound('final_diningscene.wav', [11,10],0.3,user,5,'dining',triggered = True)
-elevator = Sound("final_elevator.wav", [9,10],0.4,user,5,'elevator',triggered = True)
-scratch = Sound('final_weirdscratching.wav',[9,10],0.4,user,5,'elevator',triggered = True)
-drop = Sound('final_waterdrop.wav', [11,10],0.2, user,5, 'bath', triggered = True)
-hum = Sound('final_humming.wav', [9,9],0.2, user, 5, 'bath', triggered=True)
+piano = Sound("./Sounds/final_pianopiece.wav", [10 , 5], 0.2, user, 25, 'music', loop=True)   #make the sound at -10, 0
+static = Sound("./Sounds/final_static.wav", [15,6.5], 0.2, user, 25, 'entry', loop=True)
+eating = Sound("./Sounds/final_monstereating.wav",[1,9],0.5, user, 10, 'kitchen',loop = True, triggered=True)
+where = Sound("./Sounds/final_deepwhere.wav",[2,12],0.5, user, 10, 'kitchen', triggered=True)
+laugh = Sound("./Sounds/final_laughing.wav",[5,11],0.5, user, 10, 'kitchen',loop = True, triggered=True)
+guitar = Sound("./Sounds/final_guitar1.wav",[7,5],0.7, user, 5, 'family', triggered = True)
+breathing = Sound("./Sounds/final_heavybreathing.wav",[8,10],0.3, user, 5, 'dining', triggered=True)
+dining = Sound('./Sounds/final_diningscene.wav', [11,10],0.3,user,5,'dining',triggered = True)
+elevator = Sound("./Sounds/final_elevator.wav", [9,10],0.4,user,5,'elevator',triggered = True)
+scratch = Sound('./Sounds/final_weirdscratching.wav',[9,10],0.4,user,5,'elevator',triggered = True)
+drop = Sound('./Sounds/final_waterdrop.wav', [11,10],0.2, user,5, 'bath', triggered = True)
+hum = Sound('./Sounds/final_humming.wav', [9,9],0.2, user, 5, 'bath', triggered=True)
 
 constants = [piano, static]
 soundListD = [eating, where, laugh, guitar, breathing, dining]
