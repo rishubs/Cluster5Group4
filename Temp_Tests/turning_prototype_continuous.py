@@ -105,7 +105,7 @@ class User():
         return self.angle
 
 user = User([0,0])  #make a user at 0,0
-piano = Sound("./Sounds/piano_unaltered.wav", [-10,0], 0.5, user)   #make the sound at -10, 0
+piano = Sound("../Sounds/piano_unaltered.wav", [-10, 0], 0.5, user)   #make the sound at -10, 0
 
 userCoords = User.get_coords()
 
