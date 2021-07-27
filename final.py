@@ -4,9 +4,12 @@ import os
 import time
 import math
 import turtle
+#import sys
+
+#sys.setcheckinterval(200)
 
 #make and start pyo server
-s = Server(duplex=1, buffersize=1024, winhost='asio', nchnls=2).boot()
+s = Server(duplex=1, buffersize=4096, winhost='asio', nchnls=2).boot()
 s.start()
 
 
@@ -33,6 +36,7 @@ class Sound():
         self.hrtf = HRTF(self.sndPlayer)  #store hrtf
         self.hrtf.stop()
     def play(self,userCoords, userAngle):
+        print(self.name, 'played')
         '''plays the sound, spatialized to user's initial coords'''
         self.set_mul_and_azi(userCoords,userAngle)  #set the volume and angle of the sound initially
         self.hrtf.play()
@@ -69,6 +73,7 @@ class Sound():
         else:
             return 1/distance   #mul is inversely proportional to user's distance
     def set_mul_and_azi(self, userCoords, userAngle):
+        print(self.name, 'set')
         '''sets the mul and azi in the hrtf based on user position/angle'''
         azi = float(self.get_azi(userCoords,userAngle))    #use function to get azi
         mul = float(self.get_mul(userCoords))              #use function to get mul
@@ -88,6 +93,7 @@ class Sound():
         ymax = self.roomCoords[3]
         return xmin <= x1 <= xmax and ymin <= y1 <= ymax
     def update(self, userCoords, userAngle):
+        print(self.name, 'updated')
         self.set_mul_and_azi(userCoords, userAngle)
         if self.triggered and not self.played and self.user_in_range(userCoords) and not self.stopForever:
             print(self.name, 'played')
@@ -114,24 +120,27 @@ class User():
         self.y = coords[1]
         self.footsteps = footsteps
         self.angle = 90  #start facing north
+        self.updating = True
     def on_press(self, key):
         '''changes the user's position and angle based on keystrokes'''
-        if key == keyboard.Key.left:
-            self.turn(1)    #turn positive angle (left), on left keystroke
-        elif key == keyboard.Key.right:
-            self.turn(-1)   #turn a negative angle (right), on right keystroke
-        elif key == keyboard.Key.up:
-            self.move(True)    #take a step forward
-        elif key == keyboard.Key.down:
-            self.move(False)   #take a step back
-        print(self.x, self.y, self.angle)
-        footsteps.out()
+        if self.updating:
+            if key == keyboard.Key.left:
+                self.turn(1)    #turn positive angle (left), on left keystroke
+            elif key == keyboard.Key.right:
+                self.turn(-1)   #turn a negative angle (right), on right keystroke
+            elif key == keyboard.Key.up:
+                self.move(True)    #take a step forward
+            elif key == keyboard.Key.down:
+                self.move(False)   #take a step back
+            print(self.x, self.y, self.angle)
+            footsteps.out()
     def on_release(self, key):
         '''stops the user from moving when the key is released'''
         if key == keyboard.Key.up or key == keyboard.Key.down:
             self.stop()
     def turn(self, dir):
         '''changes the user's angle slowly, 90 degrees left or right'''
+        print('turn')
         targetAngle = (self.angle + dir*90) % 360   #calculate target angle based on direction (1 or -1)
         while round(self.angle) != round(targetAngle):  #keep iterating until we iterate angle enough to get to the target
             self.angle += dir * 5              #add or subtract based on dir
@@ -154,7 +163,10 @@ class User():
     def get_angle(self):
         '''returns the players angle'''
         return self.angle
-
+    def start_updating(self):
+        self.updating = True
+    def stop_updating(self):
+        self.updating = False
 
 wn = turtle.Screen()
 wn.setup(width=900,height=700)
@@ -164,24 +176,31 @@ wn.bgpic("downstairsHouse.gif")
 def playerUp():
   # player.sety(player.ycor()+51)
   player.forward(51)
+  print('for')
 def playerDown():
   # player.sety(player.ycor()-51)
   player.backward(51)
+  print('back')
 def playerRight():
   player.right(90)
+  print('right')
   # player.setx(player.xcor()+51.5)
   # player.right(5)
 def playerLeft():
   player.left(90)
+  print('left')
   # player.setx(player.xcor()-51.5)
   # player.left(5)
 def changeUp():
+  global upstairs
   wn.bgpic("upstairsGIF.gif")
   wn.update()
   print("change up??")
   upstairs = True
+  print(upstairs)
   for sound in soundListD:
       sound.stop()
+      print(sound.get_name, 'stopped')
 
 
 
@@ -195,34 +214,60 @@ player.penup() #prevent drawing lines
 player.left(90)
 player.goto(348,-133) #set player location
 
-wn.onkey(playerUp, "w") #function, key
-wn.onkey(playerDown, "s")
-wn.onkey(playerRight, "d")
-wn.onkey(playerLeft, "a")
-wn.onkey(playerUp, "Up") #function, key
-wn.onkey(playerDown, "Down")
-wn.onkey(playerRight, "Right")
-wn.onkey(playerLeft, "Left")
-
-plr = SfPlayer("./Sounds/final_slowwalk1.wav", loop=True, mul = 0.2)
+plr = SfPlayer("final_slowwalk1.wav", loop=True, mul = 0.2)
 footsteps = HRTF(plr)
-scene1plr = SfPlayer('./Sounds/scene1ver2.wav', mul = 0.5)
-finalScenePlr = SfPlayer('./Sounds/final_lastscenever2.wav', mul = 0.5)
-
-
 user = User([16,7], footsteps)  #make a user at 0,0
-piano = Sound("./Sounds/final_pianopiece.wav", [10 , 5], 0.2, user, 25, 'music', loop=True)   #make the sound at -10, 0
-static = Sound("./Sounds/final_static.wav", [15,6.5], 0.2, user, 25, 'entry', loop=True)
-eating = Sound("./Sounds/final_monstereating.wav",[1,9],0.5, user, 10, 'kitchen',loop = True, triggered=True)
-where = Sound("./Sounds/final_deepwhere.wav",[2,12],0.5, user, 10, 'kitchen', triggered=True)
-laugh = Sound("./Sounds/final_laughing.wav",[5,11],0.5, user, 10, 'kitchen',loop = True, triggered=True)
-guitar = Sound("./Sounds/final_guitar1.wav",[7,5],0.7, user, 5, 'family', triggered = True)
-breathing = Sound("./Sounds/final_heavybreathing.wav",[8,10],0.3, user, 5, 'dining', triggered=True)
-dining = Sound('./Sounds/final_diningscene.wav', [11,10],0.3,user,5,'dining',triggered = True)
-elevator = Sound("./Sounds/final_elevator.wav", [9,10],0.4,user,5,'elevator',triggered = True)
-scratch = Sound('./Sounds/final_weirdscratching.wav',[9,10],0.4,user,5,'elevator',triggered = True)
-drop = Sound('./Sounds/final_waterdrop.wav', [11,10],0.2, user,5, 'bath', triggered = True)
-hum = Sound('./Sounds/final_humming.wav', [9,9],0.2, user, 5, 'bath', triggered=True)
+
+def keysDeactivate():
+    global user
+    wn.onkey(None, "w") #function, key
+    wn.onkey(None, "s")
+    wn.onkey(None, "d")
+    wn.onkey(None, "a")
+    wn.onkey(None, "Up") #function, key
+    wn.onkey(None, "Down")
+    wn.onkey(None, "Right")
+    wn.onkey(None, "Left")
+    user.stop_updating()
+def keysActivate():
+    global user
+    wn.onkey(playerUp, "w") #function, key
+    wn.onkey(playerDown, "s")
+    wn.onkey(playerRight, "d")
+    wn.onkey(playerLeft, "a")
+    wn.onkey(playerUp, "Up") #function, key
+    wn.onkey(playerDown, "Down")
+    wn.onkey(playerRight, "Right")
+    wn.onkey(playerLeft, "Left")
+    user.start_updating()
+
+
+def press(key):     #make the press function
+    global user
+    user.on_press(key)  #it just calls the user method
+
+listener = keyboard.Listener(on_press=press)
+
+keysActivate()
+
+
+scene1plr = SfPlayer('scene1ver2.wav', mul = 0.5)
+finalScenePlr = SfPlayer('final_lastscenever2.wav', mul = 0.5)
+
+
+#piano = Sound("final_pianopiece.wav", [10 , 5], 0.2, user, 25, 'music', loop=True)   #make the sound at -10, 0
+piano = Sound("final_doorcreak1.wav", [10 , 5], 0.2, user, 25, 'music', loop=True)
+static = Sound("final_static.wav", [15,6.5], 0.2, user, 25, 'entry', loop=True)
+eating = Sound("final_monstereating.wav",[1,9],0.5, user, 10, 'kitchen',loop = True, triggered=True)
+where = Sound("final_deepwhere.wav",[2,12],0.5, user, 10, 'kitchen', triggered=True)
+laugh = Sound("final_laughing.wav",[5,11],0.5, user, 10, 'kitchen',loop = True, triggered=True)
+guitar = Sound("final_guitar1.wav",[7,5],0.7, user, 5, 'family', triggered = True)
+breathing = Sound("final_heavybreathing.wav",[8,10],0.3, user, 5, 'dining', triggered=True)
+dining = Sound('final_diningscene.wav', [11,10],0.3,user,5,'dining',triggered = True)
+elevator = Sound("final_elevator.wav", [9,10],0.4,user,5,'elevator',triggered = True)
+scratch = Sound('final_weirdscratching.wav',[9,10],0.4,user,5,'elevator',triggered = True)
+drop = Sound('final_waterdrop.wav', [11,10],0.2, user,5, 'bath', triggered = True)
+hum = Sound('final_humming.wav', [9,9],0.2, user, 5, 'bath', triggered=True)
 
 constants = [piano, static]
 soundListD = [eating, where, laugh, guitar, breathing, dining]
@@ -231,38 +276,48 @@ print(guitar.is_playing())
 
 upstairs = False
 
-def press(key):     #make the press function
-    global user
-    user.on_press(key)  #it just calls the user method
-
-f = input('f')
-scene1plr.out()
-time.sleep(11)
+#f = input('f')
+#scene1plr.out()
+#time.sleep(11)
 for i in range(30):
     player.forward(5.1)
-    time.sleep(float(1/3))
-time.sleep(10)
+    #time.sleep(float(1/3))
+#time.sleep(10)
 for i in range(20):
     player.left(4.5)
-    time.sleep(0.5)
+    #time.sleep(0.5)
 
 wn.listen()
-listener = keyboard.Listener(on_press=press)    #make and start listener
+#make and start listener
 listener.start()
 
 for sound in constants:
     sound.play(user.get_coords(), user.get_angle())
-
+beenUp = False
 while True:       #while its playing, constantly update the azi and mul based on user's coords and angle
+    print('1')
     for sound in soundListD:
         sound.update(user.get_coords(), user.get_angle())
+    print('2')
     for sound in soundListU:
         sound.update(user.get_coords(), user.get_angle())
     elevator.update(user.get_coords(), user.get_angle())
     scratch.update(user.get_coords(), user.get_angle())
+    print('3')
     for sound in constants:
         sound.update(user.get_coords(), user.get_angle())
+    print('4')
+    if upstairs and not beenUp:
+        print('nya?')
+        beenUp = True
+        keysDeactivate()
+        print('deactivate, been')
+        time.sleep(21)
+        print('slept')
+        keysActivate()
+        print('activated')
     if upstairs and user.get_coords()[1] < 7:
+        print('5')
         for sound in soundListU:
             sound.stop()
         for sound in constants:
@@ -270,7 +325,8 @@ while True:       #while its playing, constantly update the azi and mul based on
         finalScenePlr.out()
         time.sleep(32)
         quit()
-    wn.update()
+    print('6')
+    #wn.update()
+    print('7')
 
 time.sleep(300)  #idk why this is here but it works
-
