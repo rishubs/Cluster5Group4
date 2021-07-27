@@ -256,7 +256,7 @@ finalScenePlr = SfPlayer('final_lastscenever2.wav', mul = 0.5)
 
 
 #piano = Sound("final_pianopiece.wav", [10 , 5], 0.2, user, 25, 'music', loop=True)   #make the sound at -10, 0
-piano = Sound("final_doorcreak1.wav", [10 , 5], 0.2, user, 25, 'music', loop=True)
+piano = Sound("final_pianopiece.wav", [10 , 5], 0.2, user, 25, 'music', loop=True)
 static = Sound("final_static.wav", [15,6.5], 0.2, user, 25, 'entry', loop=True)
 eating = Sound("final_monstereating.wav",[1,9],0.5, user, 10, 'kitchen',loop = True, triggered=True)
 where = Sound("final_deepwhere.wav",[2,12],0.5, user, 10, 'kitchen', triggered=True)
@@ -326,7 +326,7 @@ while True:       #while its playing, constantly update the azi and mul based on
         time.sleep(32)
         quit()
     print('6')
-    #wn.update()
+    wn.update()
     print('7')
 
 time.sleep(300)  #idk why this is here but it works
