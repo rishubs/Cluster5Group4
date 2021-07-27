@@ -1,6 +1,9 @@
 # Cluster 5 Group 4 Project
 
 ## File Descriptions:
+#### final.py
+Final haunted house
+
 #### turning_prototype_continuous.py
 Coordinate system with piano anchor point at (-10, 0). User can walk around with arrow keys, sound azimuth/volume changes based on that. Player can turn with left/right with arrow keys.
 
