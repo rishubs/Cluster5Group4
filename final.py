@@ -40,7 +40,7 @@ class Sound():
         '''plays the sound, spatialized to user's initial coords'''
         self.set_mul_and_azi(userCoords,userAngle)  #set the volume and angle of the sound initially
         self.hrtf.play()
-        print('play?', self.name)
+        #print('play?', self.name)
         self.hrtf.out()                             #and send it out
         print(self.hrtf.isPlaying(), self.hrtf.isOutputting(), self.hrtf.mul)
     def get_azi(self, userCoords,userAngle):
@@ -73,7 +73,7 @@ class Sound():
         else:
             return 1/distance   #mul is inversely proportional to user's distance
     def set_mul_and_azi(self, userCoords, userAngle):
-        print(self.name, 'set')
+        #print(self.name, 'set')
         '''sets the mul and azi in the hrtf based on user position/angle'''
         azi = float(self.get_azi(userCoords,userAngle))    #use function to get azi
         mul = float(self.get_mul(userCoords))              #use function to get mul
@@ -93,14 +93,14 @@ class Sound():
         ymax = self.roomCoords[3]
         return xmin <= x1 <= xmax and ymin <= y1 <= ymax
     def update(self, userCoords, userAngle):
-        print(self.name, 'updated')
+        #print(self.name, 'updated')
         self.set_mul_and_azi(userCoords, userAngle)
         if self.triggered and not self.played and self.user_in_range(userCoords) and not self.stopForever:
-            print(self.name, 'played')
+            #print(self.name, 'played')
             self.play(userCoords, userAngle)
             self.played = True
             if self.room == 'elevator' and not self.elevatorHappened:
-                print('elevator entered')
+                #print('elevator entered')
                 changeUp()
                 self.elevatorHappened = True
         if self.triggered and self.played and not self.user_in_range(userCoords):
@@ -115,11 +115,11 @@ class User():
     '''represents a user in the coordinate plane with a position and an angle
     controlled by arrow keys (up = forward, l/r = turn 90 degrees)'''
     def __init__(self, coords, footsteps):
-        '''creats a user with coordinates'''
+        '''creates a user with coordinates'''
         self.x = coords[0]
         self.y = coords[1]
         self.footsteps = footsteps
-        self.angle = 90  #start facing north
+        self.angle = 90  #start facing west
         self.updating = True
     def on_press(self, key):
         '''changes the user's position and angle based on keystrokes'''
@@ -127,7 +127,9 @@ class User():
             if key == keyboard.Key.left:
                 self.turn(1)    #turn positive angle (left), on left keystroke
             elif key == keyboard.Key.right:
+                print('right')
                 self.turn(-1)   #turn a negative angle (right), on right keystroke
+                print('after turn')
             elif key == keyboard.Key.up:
                 self.move(True)    #take a step forward
             elif key == keyboard.Key.down:
@@ -176,31 +178,31 @@ wn.bgpic("downstairsHouse.gif")
 def playerUp():
   # player.sety(player.ycor()+51)
   player.forward(51)
-  print('for')
+  #print('for')
 def playerDown():
   # player.sety(player.ycor()-51)
   player.backward(51)
-  print('back')
+  #print('back')
 def playerRight():
   player.right(90)
-  print('right')
+  #print('right')
   # player.setx(player.xcor()+51.5)
   # player.right(5)
 def playerLeft():
   player.left(90)
-  print('left')
+  #print('left')
   # player.setx(player.xcor()-51.5)
   # player.left(5)
 def changeUp():
   global upstairs
   wn.bgpic("upstairsGIF.gif")
   wn.update()
-  print("change up??")
+  #print("change up??")
   upstairs = True
-  print(upstairs)
+  #print(upstairs)
   for sound in soundListD:
       sound.stop()
-      print(sound.get_name, 'stopped')
+      #print(sound.get_name, 'stopped')
 
 
 
@@ -276,16 +278,16 @@ print(guitar.is_playing())
 
 upstairs = False
 
-#f = input('f')
-#scene1plr.out()
-#time.sleep(11)
+f = input('f')
+scene1plr.out()
+time.sleep(11)
 for i in range(30):
     player.forward(5.1)
-    #time.sleep(float(1/3))
-#time.sleep(10)
+    time.sleep(float(1/3))
+time.sleep(10)
 for i in range(20):
     player.left(4.5)
-    #time.sleep(0.5)
+    time.sleep(0.5)
 
 wn.listen()
 #make and start listener
@@ -294,39 +296,40 @@ listener.start()
 for sound in constants:
     sound.play(user.get_coords(), user.get_angle())
 beenUp = False
+
 while True:       #while its playing, constantly update the azi and mul based on user's coords and angle
-    print('1')
+    #print('1')
     for sound in soundListD:
         sound.update(user.get_coords(), user.get_angle())
-    print('2')
+    #print('2')
     for sound in soundListU:
         sound.update(user.get_coords(), user.get_angle())
     elevator.update(user.get_coords(), user.get_angle())
     scratch.update(user.get_coords(), user.get_angle())
-    print('3')
+    #print('3')
     for sound in constants:
         sound.update(user.get_coords(), user.get_angle())
-    print('4')
+    #print('4')
     if upstairs and not beenUp:
-        print('nya?')
+        #print('nya?')
         beenUp = True
         keysDeactivate()
-        print('deactivate, been')
+        #print('deactivate, been')
         time.sleep(21)
-        print('slept')
+        #print('slept')
         keysActivate()
-        print('activated')
+        #print('activated')
     if upstairs and user.get_coords()[1] < 7:
-        print('5')
+        #print('5')
         for sound in soundListU:
             sound.stop()
         for sound in constants:
             sound.stop()
+        footsteps.stop()
         finalScenePlr.out()
         time.sleep(32)
         quit()
-    print('6')
+    #print('6')
     wn.update()
-    print('7')
+    #print('7')
 
-time.sleep(300)  #idk why this is here but it works
